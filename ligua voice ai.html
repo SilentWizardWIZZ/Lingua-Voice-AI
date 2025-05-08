@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinguaVoice AI | Learn Languages Naturally</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes wave {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .wave-animation {
+            animation: wave 1.5s infinite;
+        }
+        .progress-ring {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        .language-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pronunciation-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="container mx-auto max-w-6xl px-4 py-6">
+        <!-- Header with Language Selector -->
+        <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl mb-8 p-6 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold">LinguaVoice AI</h1>
+                    <p class="mt-2">Learn languages through natural conversation</p>
+                </div>
+                <div class="relative">
+                    <select id="languageSelect" class="appearance-none bg-white/20 text-white px-4 py-2 pr-8 rounded-full border border-white/30 focus:outline-none focus:ring-2 focus:ring-white">
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Progress Summary -->
+            <div class="bg-white rounded-xl shadow-lg p-6 md:col-span-1">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Progress</h2>
+                <div class="flex items-center justify-center mb-4">
+                    <div class="relative w-32 h-32">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
+                            <circle class="text-indigo-600 progress-ring" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" stroke-dasharray="251.2" stroke-dashoffset="75.36" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col">
+                            <span class="text-3xl font-bold text-gray-800">70%</span>
+                            <span class="text-sm text-gray-500">Weekly Goal</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-700">Vocabulary</span>
+                        <span class="font-medium">320 words</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-700">Grammar</span>
+                        <span class="font-medium">85% accuracy</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-700">Pronunciation</span>
+                        <span class="font-medium">92%</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-700">Streak</span>
+                        <span class="font-medium text-indigo-600">12 days</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Lesson -->
+            <div class="bg-white rounded-xl shadow-lg p-6 md:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Today's Lesson</h2>
+                    <span class="text-sm bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">Conversation Practice</span>
+                </div>
+                
+                <div class="bg-indigo-50 rounded-lg p-4 mb-4">
+                    <p class="text-gray-800 mb-2">"How would you order food at a restaurant in Spanish?"</p>
+                    <p class="text-sm text-gray-500">Try to use: "Me gustaría..." (I would like...)</p>
+                </div>
+                
+                <!-- Voice Interaction -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-center space-x-4 mb-4">
+                        <button id="recordBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-medium flex items-center">
+                            <i class="fas fa-microphone mr-2"></i> Speak Now
+                        </button>
+                        <button id="playSampleBtn" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 px-4 py-3 rounded-full font-medium flex items-center">
+                            <i class="fas fa-play mr-2 text-indigo-600"></i> Sample
+                        </button>
+                    </div>
+                    
+                    <div id="waveform" class="h-16 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-lg mb-2 relative overflow-hidden hidden">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="h-1 bg-indigo-300 rounded-full wave-bar" style="width: 20%; left: 0%;"></div>
+                            <div class="h-3 bg-indigo-400 rounded-full wave-bar" style="width: 15%; left: 22%;"></div>
+                            <div class="h-2 bg-indigo-500 rounded-full wave-bar" style="width: 25%; left: 40%;"></div>
+                            <div class="h-4 bg-indigo-600 rounded-full wave-bar" style="width: 18%; left: 68%;"></div>
+                            <div class="h-1 bg-indigo-300 rounded-full wave-bar" style="width: 20%; left: 88%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="feedbackContainer" class="hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">Pronunciation Accuracy</span>
+                            <span class="text-sm font-bold text-indigo-600">88%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="pronunciation-bar bg-indigo-600 h-2.5 rounded-full" style="width: 88%"></div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                <div>
+                                    <p class="text-green-800 font-medium">Great job!</p>
+                                    <p class="text-sm text-green-600">Your pronunciation of "gracias" was perfect.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 p-3 bg-yellow-50 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-circle text-yellow-500 mt-1 mr-2"></i>
+                                <div>
+                                    <p class="text-yellow-800 font-medium">Practice this:</p>
+                                    <p class="text-sm text-yellow-600">Try saying "por favor" with more emphasis on the 'r' sound.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="nextLessonBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-medium hidden">
+                    Continue to Grammar Practice <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Learning Modules -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Learning Modules</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Vocabulary Builder -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-medium">Vocabulary Builder</h3>
+                            <i class="fas fa-book text-xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-600 mb-3">Learn 10 new words daily with interactive flashcards</p>
+                        <button class="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 py-2 rounded-lg font-medium">
+                            Start <i class="fas fa-play ml-1 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Grammar Master -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-medium">Grammar Master</h3>
+                            <i class="fas fa-puzzle-piece text-xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-600 mb-3">Practice verb conjugations and sentence structure</p>
+                        <button class="w-full bg-purple-100 hover:bg-purple-200 text-purple-800 py-2 rounded-lg font-medium">
+                            Start <i class="fas fa-play ml-1 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Conversation Practice -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 p-4 text-white">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-medium">Conversation Practice</h3>
+                            <i class="fas fa-comments text-xl opacity-80"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-sm text-gray-600 mb-3">Real-life dialogues with voice recognition</p>
+                        <button class="w-full bg-green-100 hover:bg-green-200 text-green-800 py-2 rounded-lg font-medium">
+                            Start <i class="fas fa-play ml-1 text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flashcard Game -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Vocabulary Flashcards</h2>
+                <div class="flex items-center">
+                    <span class="text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded-full mr-2">Spanish</span>
+                    <span class="text-sm bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">10 cards</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-center mb-6">
+                <div id="flashcard" class="flip-card w-full max-w-md h-64 cursor-pointer">
+                    <div class="flip-card-inner h-full">
+                        <div class="flip-card-front bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl shadow-md p-6 flex flex-col justify-center items-center">
+                            <div class="text-4xl font-bold text-indigo-800 mb-4">hola</div>
+                            <div class="text-gray-500">Tap to reveal translation</div>
+                            <div class="mt-4">
+                                <button class="bg-white text-indigo-600 px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fas fa-volume-up"></i> Hear Pronunciation
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl shadow-md p-6 flex flex-col justify-center items-center">
+                            <div class="text-3xl font-bold mb-2">hello</div>
+                            <div class="text-indigo-100 mb-4">/ˈhəʊləʊ/</div>
+                            <div class="text-center text-indigo-100">
+                                <p class="mb-2">Common greeting</p>
+                                <p>"Hola, ¿cómo estás?"</p>
+                                <p class="italic mt-2">"Hello, how are you?"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-center space-x-4">
+                <button class="bg-red-100 hover:bg-red-200 text-red-800 px-6 py-2 rounded-full font-medium flex items-center">
+                    <i class="fas fa-times mr-2"></i> Hard
+                </button>
+                <button class="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-6 py-2 rounded-full font-medium flex items-center">
+                    <i class="fas fa-check mr-2"></i> Got it
+                </button>
+                <button class="bg-green-100 hover:bg-green-200 text-green-800 px-6 py-2 rounded-full font-medium flex items-center">
+                    <i class="fas fa-check-double mr-2"></i> Easy
+                </button>
+            </div>
+        </div>
+
+        <!-- Language Selection -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Available Languages</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="language-card bg-white rounded-xl shadow-lg p-6 text-center transition-transform duration-300 cursor-pointer hover:border-indigo-300 border-2 border-transparent">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-2xl">🇪🇸</span>
+                    </div>
+                    <h3 class="font-medium text-gray-800">Spanish</h3>
+                    <p class="text-sm text-gray-500 mt-1">Beginner friendly</p>
+                </div>
+                <div class="language-card bg-white rounded-xl shadow-lg p-6 text-center transition-transform duration-300 cursor-pointer hover:border-indigo-300 border-2 border-transparent">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-2xl">🇫🇷</span>
+                    </div>
+                    <h3 class="font-medium text-gray-800">French</h3>
+                    <p class="text-sm text-gray-500 mt-1">Romance language</p>
+                </div>
+                <div class="language-card bg-white rounded-xl shadow-lg p-6 text-center transition-transform duration-300 cursor-pointer hover:border-indigo-300 border-2 border-transparent">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-2xl">🇩🇪</span>
+                    </div>
+                    <h3 class="font-medium text-gray-800">German</h3>
+                    <p class="text-sm text-gray-500 mt-1">Precision grammar</p>
+                </div>
+                <div class="language-card bg-white rounded-xl shadow-lg p-6 text-center transition-transform duration-300 cursor-pointer hover:border-indigo-300 border-2 border-transparent">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-2xl">🇯🇵</span>
+                    </div>
+                    <h3 class="font-medium text-gray-800">Japanese</h3>
+                    <p class="text-sm text-gray-500 mt-1">Coming soon</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>LinguaVoice AI uses advanced NLP and speech recognition to accelerate language learning.</p>
+            <p class="mt-1">© 2023 LinguaVoice AI. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const playSampleBtn = document.getElementById('playSampleBtn');
+        const waveform = document.getElementById('waveform');
+        const feedbackContainer = document.getElementById('feedbackContainer');
+        const nextLessonBtn = document.getElementById('nextLessonBtn');
+        const flashcard = document.getElementById('flashcard');
+        const languageSelect = document.getElementById('languageSelect');
+        const languageCards = document.querySelectorAll('.language-card');
+        
+        // Simulate recording functionality
+        recordBtn.addEventListener('click', () => {
+            // Change button state
+            recordBtn.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop';
+            recordBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+            recordBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+            
+            // Show waveform
+            waveform.classList.remove('hidden');
+            
+            // Simulate recording animation
+            const waveBars = document.querySelectorAll('.wave-bar');
+            let animationInterval = setInterval(() => {
+                waveBars.forEach(bar => {
+                    const randomHeight = Math.floor(Math.random() * 5) + 1;
+                    bar.style.height = `${randomHeight * 4}px`;
+                });
+            }, 300);
+            
+            // Change click handler to stop recording
+            recordBtn.onclick = () => {
+                clearInterval(animationInterval);
+                recordBtn.innerHTML = '<i class="fas fa-microphone mr-2"></i> Speak Now';
+                recordBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                recordBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                waveform.classList.add('hidden');
+                
+                // Show feedback after a delay
+                setTimeout(() => {
+                    feedbackContainer.classList.remove('hidden');
+                    nextLessonBtn.classList.remove('hidden');
+                }, 800);
+                
+                // Reset click handler
+                recordBtn.onclick = () => {
+                    recordBtn.click();
+                };
+            };
+        });
+        
+        // Play sample audio
+        playSampleBtn.addEventListener('click', () => {
+            playSampleBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i> Playing...';
+            playSampleBtn.disabled = true;
+            
+            // Simulate audio playback
+            setTimeout(() => {
+                playSampleBtn.innerHTML = '<i class="fas fa-play mr-2 text-indigo-600"></i> Sample';
+                playSampleBtn.disabled = false;
+            }, 2000);
+        });
+        
+        // Flip flashcard
+        flashcard.addEventListener('click', () => {
+            flashcard.classList.toggle('flipped');
+        });
+        
+        // Language selection
+        languageSelect.addEventListener('change', () => {
+            const lang = languageSelect.value;
+            // In a real app, this would change the app language
+            console.log(`Language changed to ${lang}`);
+        });
+        
+        // Language card selection
+        languageCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove active state from all cards
+                languageCards.forEach(c => {
+                    c.classList.remove('border-indigo-500', 'bg-indigo-50');
+                    c.classList.add('border-transparent');
+                });
+                
+                // Add active state to clicked card
+                card.classList.remove('border-transparent');
+                card.classList.add('border-indigo-500', 'bg-indigo-50');
+                
+                // In a real app, this would change the selected language
+                const language = card.querySelector('h3').textContent;
+                console.log(`Selected language: ${language}`);
+            });
+        });
+        
+        // Simulate progress animation
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const progressRing = document.querySelector('.progress-ring');
+                progressRing.style.strokeDashoffset = '75.36'; // 70% progress
+                
+                const pronunciationBar = document.querySelector('.pronunciation-bar');
+                pronunciationBar.style.width = '88%';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
